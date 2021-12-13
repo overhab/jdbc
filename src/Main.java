@@ -5,8 +5,15 @@ public class Main {
 		App mysqlCon = new App();
 
 		mysqlCon.readDataBase();
+
+
+/* 		System.out.println("");
+		mysqlCon.FillDataBaseFromFile();
+		System.out.println(""); */
+
+/* 		mysqlCon.readDataBase();
 		mysqlCon.addUser();
-		mysqlCon.readDataBase();
+		mysqlCon.readDataBase(); */
 		//mysqlCon.updateUser();
 
 		//mysqlCon.deteleUser();
