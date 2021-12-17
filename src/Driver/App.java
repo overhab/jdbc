@@ -13,14 +13,22 @@ public class App {
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
 	private String	jdbcUrl = System.getenv("JDBC_URL");
-	private String	mysqlUser = System.getenv("MYSQL_U");
-	private String	mysqlPass = System.getenv("MYSQL_P");
+	//private String	mysqlUser = System.getenv("MYSQL_U");
+	//private String	mysqlPass = System.getenv("MYSQL_P");
 
+	public App(String user, String pass) throws Exception {
+		try {
+			con = DriverManager.getConnection(jdbcUrl, user, pass);
+		} catch (Exception exc) {
+			System.out.println(exc);
+			throw new Exception("Connection failed");
+		}
+		System.out.println("Connected.");
+	}
 	
 	private boolean checkForDuplicate(String email) {
 
 		try {
-			con = DriverManager.getConnection(jdbcUrl, mysqlUser, mysqlPass);
 
 			my_Statement = con.createStatement();
 
@@ -28,16 +36,16 @@ public class App {
 
 			while (resultSet.next()) {
 				if (resultSet.getString("email").compareTo(email) == 0) {
-					close_connection();
+					close_connection(0);
 					return true;
 				}
 			}
-			close_connection();
+			close_connection(0);
 			return false;
 
 		} catch (Exception exc) {
 			exc.printStackTrace();
-			close_connection();
+			close_connection(0);
 			return false;
 		}
 
@@ -47,8 +55,6 @@ public class App {
 		List<Object> newUser = CreateUser.generateUser();
 
 		try {
-			con = DriverManager.getConnection(jdbcUrl, mysqlUser, mysqlPass);
-			// getConnection(url - mysql database url, user, password)
 
 			preparedStatement = con.prepareStatement("insert into users " + "(name, nickname, age, email) "
 			+ "values (?, ?, ?, ?)");
@@ -60,7 +66,7 @@ public class App {
 
 			if (checkForDuplicate((String) newUser.get(3))) {
 				System.out.println("Email \'" + (String) newUser.get(3) + "\' already in a database");
-				close_connection();
+				close_connection(0);
 				return ;
 			}
 
@@ -70,15 +76,13 @@ public class App {
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
-			close_connection();
+			close_connection(0);
 		}
-		close_connection();
+		close_connection(0);
 	}
 
 	public void addUser(List<Object> newUser) throws Exception {
 		try {
-			con = DriverManager.getConnection(jdbcUrl, mysqlUser, mysqlPass);
-			// getConnection(url - mysql database url, user, password)
 
 			preparedStatement = con.prepareStatement("insert into users " + "(name, nickname, age, email) "
 			+ "values (?, ?, ?, ?)");
@@ -90,7 +94,7 @@ public class App {
 
 			if (checkForDuplicate((String) newUser.get(3))) {
 				System.out.println("Email \'" + (String) newUser.get(3) + "\' already in a database");
-				close_connection();
+				close_connection(0);
 				return ;
 			}
 
@@ -100,9 +104,9 @@ public class App {
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
-			close_connection();
+			close_connection(0);
 		}
-		close_connection();
+		close_connection(0);
 	}
 
 	public void updateUser() throws Exception {
@@ -126,13 +130,10 @@ public class App {
 		scanner.close();
 
 		try {
-			con = DriverManager.getConnection(jdbcUrl, mysqlUser, mysqlPass);
-			// getConnection(url - mysql database url, user, password)
+			
 			my_Statement = con.createStatement();
 
 			String sql = "update users set email='acxbot@gmail.com' where id=" + id;
-
-			//System.out.println(sql);
 
 			my_Statement.execute(sql);
 
@@ -140,15 +141,14 @@ public class App {
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
-			close_connection();
+			close_connection(0);
 		}
-		close_connection();
+		close_connection(0);
 	}
 
     public void readDataBase() throws Exception {
 		try {
-			con = DriverManager.getConnection(jdbcUrl, mysqlUser, mysqlPass);
-			// getConnection(url - mysql database url, user, password)
+			
 			my_Statement = con.createStatement();
 
 			resultSet = my_Statement.executeQuery("select * from users");
@@ -161,20 +161,17 @@ public class App {
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
-			close_connection();
+			close_connection(0);
 		}
-		close_connection();
+		close_connection(0);
     }
 
 	public void deteleUserByEmail(String email) throws Exception {
 		try {
-			con = DriverManager.getConnection(jdbcUrl, mysqlUser, mysqlPass);
-			// getConnection(url - mysql database url, user, password)
+
 			my_Statement = con.createStatement();
 
 			String sql = "delete from users where email = \'" + email + "\'";
-
-			//System.out.println(sql);
 
 			my_Statement.execute(sql);
 
@@ -182,18 +179,18 @@ public class App {
 		}
 		catch (Exception exc) {
 			exc.printStackTrace();
-			close_connection();
+			close_connection(0);
 		}
-		close_connection();
+		close_connection(0);
 	}
 
-	private void close_connection() {
+	public void close_connection(int flag) {
 		try {
 			if (resultSet != null)
 				resultSet.close();
 			if (my_Statement != null)
 				my_Statement.close();
-			if (con != null)
+			if (flag == 1 && con != null)
 				con.close();
 		}
 		catch (Exception exc) {
@@ -215,10 +212,8 @@ public class App {
 		while ((newUser = buff.readLine()) != null) {
 			user = newUser.split(",");
 			List<Object> userList = List.of(user[0], user[1], Integer.parseInt(user[2]), user[3]);
-			//System.out.println(user[0] + " - " + user[1] + " - " + user[2] + " - " + user[3]);
 			addUser(userList);
 		}
 		buff.close();
-		//List<Object> newUser = List.of(name, nickname, age, email);
 	}
 }

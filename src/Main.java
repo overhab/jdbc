@@ -1,10 +1,11 @@
 import Driver.App;
+import GUI.GUI;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
-		App mysqlCon = new App();
+		//App mysqlCon = new App();
 
-		mysqlCon.readDataBase();
+		//mysqlCon.readDataBase();
 
 
 /* 		System.out.println("");
@@ -17,5 +18,8 @@ public class Main {
 		//mysqlCon.updateUser();
 
 		//mysqlCon.deteleUser();
+
+		GUI gui = new GUI();
+		//gui.setVisible(true);
 	}
 }
